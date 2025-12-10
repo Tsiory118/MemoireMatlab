@@ -21,14 +21,12 @@ class LidarMatrix(BaseModel):
     matrix: List[List[Measurement]]
     timestamp: str
 
-
 # ==================================================
 #              FONCTIONS DE SAUVEGARDE
 # ==================================================
 
 def save_to_json(data: dict, filename="data.json"):
     """Ajoute une nouvelle frame dans data.json"""
-
     if os.path.exists(filename):
         with open(filename, "r") as f:
             try:
@@ -45,24 +43,20 @@ def save_to_json(data: dict, filename="data.json"):
 
 
 def save_to_csv(matrix: List[List[Measurement]], timestamp: str, filename="data.csv"):
+    """Sauvegarde chaque ligne de la matrice 8x8 comme ligne CSV avec timestamp"""
     file_exists = os.path.exists(filename)
 
     with open(filename, "a", newline="") as f:
         writer = csv.writer(f)
 
-        # En-têtes
+        # Écrire en-têtes seulement si le fichier n'existe pas
         if not file_exists:
-            header = ["timestamp"] + [f"cell_{i}" for i in range(64)]
+            header = ["timestamp"] + [f"cell_{i}" for i in range(8)]
             writer.writerow(header)
 
-        row_values = [timestamp]
-
         for row in matrix:
-            for cell in row:
-                row_values.append(cell.distance_mm)
-
-        writer.writerow(row_values)
-
+            row_values = [timestamp] + [cell.distance_mm for cell in row]
+            writer.writerow(row_values)
 
 # ==================================================
 #                   ENDPOINT API
